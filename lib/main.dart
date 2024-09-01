@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
-import 'package:webapp/data/models/repository.dart';
-import 'dart:convert'; 
+import 'package:webapp/presentation/AboutPage.dart';
+import 'package:webapp/presentation/HomePage.dart';
+import 'package:webapp/presentation/SearchPage.dart';
+
 void main() {
   runApp(const ProviderScope(child: MyApp()));
 }
@@ -31,61 +32,85 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
-   List<Repository> _repositories = [];
-  Future<void> getRepo() async {
-    print("取得します");
-    final url = Uri.https("api.github.com","users/yabuki829/repos");
-    final response = await http.get(url);
-     final List list = json.decode(response.body);
-    // こういう取得方法になるので typo したりネストしたりが大変！🥺
-    // debugPrint(list[0]['name']);
-
-    // リストに入ってる Map<String, dynamic> を map で１つ１つ取り出しさっき作った Repository モデルに変換
-    final List<Repository> repositories =
-        list.map((item) => Repository.fromJson(item)).toList();
-    // 'name' と指定したものが，直接アクセスして取得できるように！
-    // ドットを打つと候補が出てくるので便利〜！🎉
-    print(repositories[0].name);
-
-   setState(() {
-     
-     _repositories = repositories;
-   });
-
-  
-  }
-
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-    // Scaffold は土台みたいな感じ（白紙みたいな）
     return Scaffold(
-      // AppBar は上のヘッダー
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      // Center で真ん中寄せ
-      body: _repositories.isEmpty
-          ? const SizedBox.shrink()
-          : ListView.builder(
-              itemCount: _repositories.length,
-              itemBuilder: ((context, index) {
-                return Row(
-                  children: [
-                    Text(_repositories[index].name),
-                    Text(_repositories[index].url),
-                  ],
-                );
-              }),
-            ),
-      // 右下のプラスボタン（Floating Action Button と言います）
-      floatingActionButton:  FloatingActionButton(
-            onPressed: getRepo,
-            tooltip: 'Increment',
-            child: const Icon(Icons.add),
+      body: Row(
+        children: [
+          NavigationRail(
+            destinations: const [
+              NavigationRailDestination(
+                icon: Icon(Icons.home),
+                label: Text('Home'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.info),
+                label: Text('アバウト'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.search),
+                label: Text('検索'),
+              ),
+            ],
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: (index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
           ),
+          Expanded(
+            child: MainContents(index: _selectedIndex),
+          ),
+        ],
+      ),
     );
   }
 }
+
+class MainContents extends StatelessWidget {
+  const MainContents({super.key, required this.index});
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    switch (index) {
+      case 0:
+        return const HomePage(title: "ホーム画面");
+      case 1:
+        return const Aboutpage(title: "アバウトページ");
+      case 2:
+        return const SearchPage(title: "検索画面");
+      default:
+        return const ErrorView(title: "Unknown Page");
+    }
+  }
+}
+
+class ErrorView extends StatefulWidget {
+  final String title;
+  const ErrorView({super.key, required this.title});
+
+  @override
+  State<StatefulWidget> createState() => _ErrorState();
+}
+
+class _ErrorState extends State<ErrorView> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Center(
+        child: Container(
+          color: Colors.blue,
+          child: Text(widget.title, style: const TextStyle(color: Colors.white)),
+        ),
+      ),
+    );
+  }
+}
+
