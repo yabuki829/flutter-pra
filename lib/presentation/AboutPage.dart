@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
-class Aboutpage extends StatefulWidget {
-  const Aboutpage({super.key, required this.title});
+class AboutPage extends StatefulWidget {
+  const AboutPage({super.key, required this.title});
   final String title;
   @override
-  State<Aboutpage> createState() => _AboutpageState();
+  State<AboutPage> createState() => _AboutpageState();
 }
 
-class _AboutpageState extends State<Aboutpage> {
+class _AboutpageState extends State<AboutPage> {
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +17,17 @@ class _AboutpageState extends State<Aboutpage> {
         backgroundColor: Colors.redAccent,
         title: Text(widget.title),
       ),
-      body: Text(widget.title),
+      body: Column(
+        children: [
+          Text(widget.title),
+          Center(
+            child: ElevatedButton(onPressed: 
+            () => context.go('/details'),
+            child: const Text("詳細画面に遷移する")
+          )
+          )
+        ],
+      ),
    
     );
   }

@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:webapp/presentation/AboutPage.dart';
 import 'package:webapp/presentation/HomePage.dart';
 import 'package:webapp/presentation/SearchPage.dart';
+import 'package:webapp/routes/router.dart';
+
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -12,13 +14,14 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: router,
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'FirstView'),
+    
     );
   }
 }
@@ -80,7 +83,7 @@ class MainContents extends StatelessWidget {
       case 0:
         return const HomePage(title: "ホーム画面");
       case 1:
-        return const Aboutpage(title: "アバウトページ");
+        return const AboutPage(title: "アバウトページ");
       case 2:
         return const SearchPage(title: "検索画面");
       default:
